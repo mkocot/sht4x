@@ -55,6 +55,15 @@
 #define SHT4X_COMMAND_READ_SERIAL_NUMBER    0x89        /**< read serial number command */
 
 /**
+ * @brief helper macros
+ */
+#ifdef DRIVER_SHT4X_WITH_DEBUG_PRINT
+#define DRIVER_SHT4X_DEBUG_PRINT(FMT, ...)  handle->debug_print(FMT, ##__VA_ARGS__)
+#else
+#define DRIVER_SHT4X_DEBUG_PRINT(FMT, ...)  do {} while(0)
+#endif
+
+/**
  * @brief      write and read bytes
  * @param[in]  *handle pointer to an sht4x handle structure
  * @param[in]  cmd sent command
@@ -132,44 +141,46 @@ uint8_t sht4x_init(sht4x_handle_t *handle)
     {
         return 2;                                                            /* return error */
     }
+#ifdef DRIVER_SHT4X_WITH_DEBUG_PRINT
     if (handle->debug_print == NULL)                                         /* check debug_print */
     {
         return 3;                                                            /* return error */
     }
+#endif
     if (handle->iic_init == NULL)                                            /* check iic_init */
     {
-        handle->debug_print("sht4x: iic_init is null.\n");                   /* iic_init is null */
+        DRIVER_SHT4X_DEBUG_PRINT("sht4x: iic_init is null.\n");              /* iic_init is null */
        
         return 3;                                                            /* return error */
     }
     if (handle->iic_deinit == NULL)                                          /* check iic_deinit */
     {
-        handle->debug_print("sht4x: iic_deinit is null.\n");                 /* iic_deinit is null */
+        DRIVER_SHT4X_DEBUG_PRINT("sht4x: iic_deinit is null.\n");            /* iic_deinit is null */
        
         return 3;                                                            /* return error */
     }
     if (handle->iic_read_cmd == NULL)                                        /* check iic_read_cmd */
     {
-        handle->debug_print("sht4x: iic_read_cmd is null.\n");               /* iic_read_cmd is null */
+        DRIVER_SHT4X_DEBUG_PRINT("sht4x: iic_read_cmd is null.\n");          /* iic_read_cmd is null */
        
         return 3;                                                            /* return error */
     }
     if (handle->iic_write_cmd == NULL)                                       /* check iic_write_cmd */
     {
-        handle->debug_print("sht4x: iic_write_cmd is null.\n");              /* iic_write_cmd is null */
+        DRIVER_SHT4X_DEBUG_PRINT("sht4x: iic_write_cmd is null.\n");         /* iic_write_cmd is null */
        
         return 3;                                                            /* return error */
     }
     if (handle->delay_ms == NULL)                                            /* check delay_ms */
     {
-        handle->debug_print("sht4x: delay_ms is null.\n");                   /* delay_ms is null */
+        DRIVER_SHT4X_DEBUG_PRINT("sht4x: delay_ms is null.\n");              /* delay_ms is null */
        
         return 3;                                                            /* return error */
     }
     
     if (handle->iic_init() != 0)                                             /* iic init */
     {
-        handle->debug_print("sht4x: iic init failed.\n");                    /* iic init failed */
+        DRIVER_SHT4X_DEBUG_PRINT("sht4x: iic init failed.\n");               /* iic init failed */
        
         return 1;                                                            /* return error */
     }
@@ -177,7 +188,7 @@ uint8_t sht4x_init(sht4x_handle_t *handle)
                              10, NULL, 0);                                   /* soft reset */
     if (res != 0)                                                            /* check result */
     {
-        handle->debug_print("sht4x: write command failed.\n");               /* write command failed */
+        DRIVER_SHT4X_DEBUG_PRINT("sht4x: write command failed.\n");          /* write command failed */
         (void)handle->iic_deinit();                                          /* close iic */
         
         return 4;                                                            /* return error */
@@ -215,13 +226,13 @@ uint8_t sht4x_deinit(sht4x_handle_t *handle)
                              10, NULL, 0);                            /* soft reset */
     if (res != 0)                                                     /* check result */
     {
-        handle->debug_print("sht4x: write command failed.\n");        /* write command failed */
+        DRIVER_SHT4X_DEBUG_PRINT("sht4x: write command failed.\n");   /* write command failed */
         
         return 4;                                                     /* return error */
     }
     if (handle->iic_deinit() != 0)                                    /* iic deinit */
     {
-        handle->debug_print("sht4x: iic deinit failed.\n");           /* iic deinit failed */
+        DRIVER_SHT4X_DEBUG_PRINT("sht4x: iic deinit failed.\n");      /* iic deinit failed */
        
         return 1;                                                     /* return error */
     }
@@ -315,7 +326,7 @@ uint8_t sht4x_read(sht4x_handle_t *handle, sht4x_mode_t mode,
                                      10, buf, 6);                                             /* read data */
             if (res != 0)                                                                     /* check result */
             {
-                handle->debug_print("sht4x: write command failed.\n");                        /* write command failed */
+                DRIVER_SHT4X_DEBUG_PRINT("sht4x: write command failed.\n");                   /* write command failed */
                 
                 return 1;                                                                     /* return error */
             }
@@ -329,7 +340,7 @@ uint8_t sht4x_read(sht4x_handle_t *handle, sht4x_mode_t mode,
                                      5, buf, 6);                                              /* read data */
             if (res != 0)                                                                     /* check result */
             {
-                handle->debug_print("sht4x: write command failed.\n");                        /* write command failed */
+                DRIVER_SHT4X_DEBUG_PRINT("sht4x: write command failed.\n");                   /* write command failed */
                 
                 return 1;                                                                     /* return error */
             }
@@ -343,7 +354,7 @@ uint8_t sht4x_read(sht4x_handle_t *handle, sht4x_mode_t mode,
                                      2, buf, 6);                                              /* read data */
             if (res != 0)                                                                     /* check result */
             {
-                handle->debug_print("sht4x: write command failed.\n");                        /* write command failed */
+                DRIVER_SHT4X_DEBUG_PRINT("sht4x: write command failed.\n");                   /* write command failed */
                 
                 return 1;                                                                     /* return error */
             }
@@ -357,7 +368,7 @@ uint8_t sht4x_read(sht4x_handle_t *handle, sht4x_mode_t mode,
                                      1100, buf, 6);                                           /* read data */
             if (res != 0)                                                                     /* check result */
             {
-                handle->debug_print("sht4x: write command failed.\n");                        /* write command failed */
+                DRIVER_SHT4X_DEBUG_PRINT("sht4x: write command failed.\n");                   /* write command failed */
                 
                 return 1;                                                                     /* return error */
             }
@@ -371,7 +382,7 @@ uint8_t sht4x_read(sht4x_handle_t *handle, sht4x_mode_t mode,
                                      110, buf, 6);                                            /* read data */
             if (res != 0)                                                                     /* check result */
             {
-                handle->debug_print("sht4x: write command failed.\n");                        /* write command failed */
+                DRIVER_SHT4X_DEBUG_PRINT("sht4x: write command failed.\n");                   /* write command failed */
                 
                 return 1;                                                                     /* return error */
             }
@@ -385,7 +396,7 @@ uint8_t sht4x_read(sht4x_handle_t *handle, sht4x_mode_t mode,
                                      1100, buf, 6);                                           /* read data */
             if (res != 0)                                                                     /* check result */
             {
-                handle->debug_print("sht4x: write command failed.\n");                        /* write command failed */
+                DRIVER_SHT4X_DEBUG_PRINT("sht4x: write command failed.\n");                   /* write command failed */
                 
                 return 1;                                                                     /* return error */
             }
@@ -399,7 +410,7 @@ uint8_t sht4x_read(sht4x_handle_t *handle, sht4x_mode_t mode,
                                      110, buf, 6);                                            /* read data */
             if (res != 0)                                                                     /* check result */
             {
-                handle->debug_print("sht4x: write command failed.\n");                        /* write command failed */
+                DRIVER_SHT4X_DEBUG_PRINT("sht4x: write command failed.\n");                   /* write command failed */
                 
                 return 1;                                                                     /* return error */
             }
@@ -413,7 +424,7 @@ uint8_t sht4x_read(sht4x_handle_t *handle, sht4x_mode_t mode,
                                      1100, buf, 6);                                           /* read data */
             if (res != 0)                                                                     /* check result */
             {
-                handle->debug_print("sht4x: write command failed.\n");                        /* write command failed */
+                DRIVER_SHT4X_DEBUG_PRINT("sht4x: write command failed.\n");                   /* write command failed */
                 
                 return 1;                                                                     /* return error */
             }
@@ -427,7 +438,7 @@ uint8_t sht4x_read(sht4x_handle_t *handle, sht4x_mode_t mode,
                                      110, buf, 6);                                            /* read data */
             if (res != 0)                                                                     /* check result */
             {
-                handle->debug_print("sht4x: write command failed.\n");                        /* write command failed */
+                DRIVER_SHT4X_DEBUG_PRINT("sht4x: write command failed.\n");                   /* write command failed */
                 
                 return 1;                                                                     /* return error */
             }
@@ -443,13 +454,13 @@ uint8_t sht4x_read(sht4x_handle_t *handle, sht4x_mode_t mode,
     }
     if (a_sht4x_crc(buf + 0, 2) != buf[2])                                                    /* check crc */
     {
-        handle->debug_print("sht4x: crc is error.\n");                                        /* crc is error */
+        DRIVER_SHT4X_DEBUG_PRINT("sht4x: crc is error.\n");                                   /* crc is error */
         
         return 4;                                                                             /* return error */
     }
     if (a_sht4x_crc(buf + 3, 2) != buf[5])                                                    /* check crc */
     {
-        handle->debug_print("sht4x: crc is error.\n");                                        /* crc is error */
+        DRIVER_SHT4X_DEBUG_PRINT("sht4x: crc is error.\n");                                   /* crc is error */
         
         return 4;                                                                             /* return error */
     }
@@ -499,20 +510,20 @@ uint8_t sht4x_get_serial_number(sht4x_handle_t *handle, uint8_t num[4])
                              10, buf, 6);                                     /* read serial number */
     if (res != 0)                                                             /* check result */
     {
-        handle->debug_print("sht4x: write command failed.\n");                /* write command failed */
+        DRIVER_SHT4X_DEBUG_PRINT("sht4x: write command failed.\n");           /* write command failed */
         
         return 1;                                                             /* return error */
     }
     
     if (a_sht4x_crc(buf + 0, 2) != buf[2])                                    /* check crc */
     {
-        handle->debug_print("sht4x: crc is error.\n");                        /* crc is error */
+        DRIVER_SHT4X_DEBUG_PRINT("sht4x: crc is error.\n");                   /* crc is error */
         
         return 4;                                                             /* return error */
     }
     if (a_sht4x_crc(buf + 3, 2) != buf[5])                                    /* check crc */
     {
-        handle->debug_print("sht4x: crc is error.\n");                        /* crc is error */
+        DRIVER_SHT4X_DEBUG_PRINT("sht4x: crc is error.\n");                   /* crc is error */
         
         return 4;                                                             /* return error */
     }
@@ -551,7 +562,7 @@ uint8_t sht4x_soft_reset(sht4x_handle_t *handle)
                              10, NULL, 0);                            /* soft reset */
     if (res != 0)                                                     /* check result */
     {
-        handle->debug_print("sht4x: write command failed.\n");        /* write command failed */
+        DRIVER_SHT4X_DEBUG_PRINT("sht4x: write command failed.\n");   /* write command failed */
         
         return 1;                                                     /* return error */
     }
